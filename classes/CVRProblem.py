@@ -49,7 +49,7 @@ class CVRProblem:
                 instances_created.append(CVRPSolutionInstance(routes_list))
         self.first_population = instances_created
 
-    
+
 
     @staticmethod
     def generate_distances_adjacent_matrix(list_clients, depot_point):

@@ -21,5 +21,5 @@ class Client(Point):
         axes_plot.plot(self.x_position, self.y_position, marker="o", color=color)
         if reference != '-1':
             axes_plot.text(self.x_position, self.y_position, reference)
-            axes_plot.text(self.x_position+0.35, self.y_position+0.35, self.packet_weight, color='#FF8000') if show_point_id_subtitle else None
-            axes_plot.text(self.x_position-0.35, self.y_position+0.35, self.id, color='#FF007F') if show_point_weight_subtitle else None
+            axes_plot.text(self.x_position+0.35, self.y_position+0.35, self.packet_weight, color='#FF8000') if show_point_weight_subtitle else None
+            axes_plot.text(self.x_position-0.35, self.y_position+0.35, self.id, color='#FF007F') if show_point_id_subtitle else None

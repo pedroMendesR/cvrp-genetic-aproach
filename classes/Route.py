@@ -69,8 +69,14 @@ class Route:
             result = math.pi + math.atan((y_difference)/(x_difference))
         elif y_difference < 0 and x_difference == 0:
             result = 3*(math.pi/2)
-        else:
+        elif y_difference < 0 and x_difference > 0:
             result = 2*math.pi + math.atan((y_difference)/(x_difference))
+        else:
+            print(x_difference)
+            print(y_difference)
+            print(client)
+            print(depot_point)
+            input()
         return result
 
     @staticmethod
@@ -78,3 +84,4 @@ class Route:
         sweep_list = list_clients[:]
         sweep_list.sort(key=lambda client : Route.sweep_function(client, depot_point))
         return sweep_list
+    
