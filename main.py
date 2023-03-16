@@ -24,12 +24,13 @@ all_clients = []
 
 
 cvrp = create_cvrp_problem()
+
 #print(cvrp.__str__())
 # print(np.matrix(cvrp.distances_adjacent_matrix).shape)
 # for clients in cvrp.list_clients:
 #     print(clients)
 
-cvrp.generate_first_route_population([(Route.generate_random_route, 4)])
+cvrp.generate_first_route_population([(Route.generate_sweep_route, 1),(Route.generate_random_route,3)])
 
 fig = plt.figure()
 axs = fig.subplots(2,2)

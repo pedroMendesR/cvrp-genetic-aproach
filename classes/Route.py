@@ -1,3 +1,4 @@
+import math
 import random
 from typing import List
 from classes.Client import Client
@@ -50,7 +51,30 @@ class Route:
         return total_route_cost
         
     @staticmethod
-    def generate_random_route(list_clients: List[Client]) -> List[Client]:
+    def generate_random_route(list_clients: List[Client], depot_point) -> List[Client]:
         random_list = list_clients[:]
         random.shuffle(random_list)
         return random_list
+
+    @staticmethod
+    def sweep_function(client: Client, depot_point: Point):
+        result = 0
+        y_difference = client.y_position-depot_point.y_position
+        x_difference = client.x_position-depot_point.x_position
+        if y_difference >= 0 and x_difference > 0:
+            result = math.atan((y_difference)/(x_difference))
+        elif y_difference > 0 and x_difference == 0:
+            result = math.pi/2
+        elif x_difference < 0:
+            result = math.pi + math.atan((y_difference)/(x_difference))
+        elif y_difference < 0 and x_difference == 0:
+            result = 3*(math.pi/2)
+        else:
+            result = 2*math.pi + math.atan((y_difference)/(x_difference))
+        return result
+
+    @staticmethod
+    def generate_sweep_route(list_clients: List[Client], depot_point: Point) -> List[Client]:
+        sweep_list = list_clients[:]
+        sweep_list.sort(key=lambda client : Route.sweep_function(client, depot_point))
+        return sweep_list

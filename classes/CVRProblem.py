@@ -30,7 +30,7 @@ class CVRProblem:
         for method, quantity in instances_by_method:
             for _ in range(quantity):
 
-                population_order_list = method(self.list_clients)
+                population_order_list = method(self.list_clients, self.depot_point)
                 routes_list = []
                 temp_list = []
                 for index, client_ordered in enumerate(population_order_list):

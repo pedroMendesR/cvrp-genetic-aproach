@@ -3,6 +3,7 @@ from classes.Point import Point
 
 show_point_id_subtitle = False
 show_point_weight_subtitle = False
+
 class Client(Point):
 
     def __init__(self, x_position: float, y_position: float, packet_weight: float=0):
