@@ -32,83 +32,91 @@ ylim_plot = [info['ylim'][0]*0.95, info['ylim'][1]*1.05]
 
 population_size = 200
 constructed_population = 0.3
-number_iterations = 500
+number_iterations = 200
 
-mutation_rate = 0.1
-crossover_rate = 0.9
+mutation_rate = 0.15
+crossover_rate = 0.55
 
+trials_number = 10
+result_vector = []
+for trial in range(trials_number):
 
-initial_population = [int(constructed_population*population_size),population_size-int(constructed_population*population_size)]
+    initial_population = [int(constructed_population*population_size),population_size-int(constructed_population*population_size)]
 
-cvrp = CVRProblem(depot_point=info['depot_point'], list_clients=info['clients_list'], max_weight=info['maximum_weight_load'])
-cvrp.generate_first_route_population([(Route.generate_sweep_route,initial_population[0]),(Route.generate_random_route,initial_population[1])])
+    cvrp = CVRProblem(depot_point=info['depot_point'], list_clients=info['clients_list'], max_weight=info['maximum_weight_load'])
+    cvrp.generate_first_route_population([(Route.generate_sweep_route,initial_population[0]),(Route.generate_random_route,initial_population[1])])
 
-x_axis = [0]
-y_axis = [CVRPSolutionInstance.get_better_route(cvrp.first_population)[1]]
+    x_axis = [0]
+    y_axis = [CVRPSolutionInstance.get_better_route(cvrp.first_population)[1]]
 
-print(x_axis)
-print(y_axis)
+    #print(x_axis)
+    #print(y_axis)
 
-last_generation = cvrp.first_population
+    last_generation = cvrp.first_population
 
-better_instance = None
+    better_instance = None
 
-for iteration in range(number_iterations):
-    print(iteration)
-    x_axis.append(iteration+1)
-    offspring = []
-    child_number = 0
+    for iteration in range(number_iterations):
+        print(trial,'.',iteration)
+        x_axis.append(iteration+1)
+        offspring = []
+        child_number = 0
 
-    # CROSSOVER OPERATIONS
-    crossover_probability = random.uniform(0,1)
-    #
-    for i in range(sum(initial_population)):
-        parents = random.choices(last_generation, k=2)
-        #print('cross: ', i)
-        #last_generation = [item for item in last_generation if item not in parents]
-        if crossover_probability < crossover_rate:
-           # offsprings_crossover = CVRPSolutionInstance.different_ohga_crossover(parents[0],parents[1],cvrp.depot_point,cvrp.max_weight)
-            #offspring.append(offsprings_crossover[0])
-            #offspring.append(offsprings_crossover[1])
-            offspring.append(CVRPSolutionInstance.exchange_position_crossover(parents[0],parents[1],cvrp.depot_point,cvrp.max_weight,range_max_weight_acceptable=[1,1]))
-            offspring.append(random.choice(parents))
-            #input(offsprings_crossover)
-        else:
-            offspring.append(parents[0])
-            offspring.append(parents[1])
+        # CROSSOVER OPERATIONS
+        crossover_probability = random.uniform(0,1)
+        #
+        for i in range(sum(initial_population)):
+            parents = random.choices(last_generation, k=2)
+            #print('cross: ', i)
+            #last_generation = [item for item in last_generation if item not in parents]
+            if crossover_probability < crossover_rate:
+                #offspring.append(CVRPSolutionInstance.exchange_position_crossover(parents[0],parents[1],cvrp.depot_point,cvrp.max_weight,range_max_weight_acceptable=[1,1]))
+                #offspring.append(random.choice(parents))
+                offspring.append(CVRPSolutionInstance.exchange_position_crossover_v2(parents[0],parents[1],cvrp.depot_point,cvrp.max_weight,range_max_weight_acceptable=[1,1]))
+                offspring.append(CVRPSolutionInstance.exchange_position_crossover_v2(parents[1],parents[0],cvrp.depot_point,cvrp.max_weight,range_max_weight_acceptable=[1,1]))
+                #input(offsprings_crossover)
+            else:
+                offspring.append(parents[0])
+                offspring.append(parents[1])
 
-    # OFFSPRING MUTATION 
-    
+        # OFFSPRING MUTATION 
+        
 
-    for child in offspring:
-        child.mutate_exchange(mutation_rate, cvrp.max_weight)
-
-
-    offspring_backup = offspring
-    offspring = []
-
-    # TOURNAMENTS OF OFFSPRING
-    while len(offspring_backup) > 1:
-        parents_index = random.sample([index for index in range(len(offspring_backup))], 2)
-        parents = [offspring_backup[parents_index[0]], offspring_backup[parents_index[1]]]
-
-        offspring_backup = [item for index,item in enumerate(offspring_backup) if index not in parents_index]
-        offspring.append(CVRPSolutionInstance.get_better_route(parents)[0])
+        for child in offspring:
+            child.mutate_exchange(mutation_rate, cvrp.max_weight)
 
 
-    better_instance, value = CVRPSolutionInstance.get_better_route(offspring)
+        offspring_backup = offspring
+        offspring = []
 
-    
+        # TOURNAMENTS OF OFFSPRING
+        while len(offspring_backup) > 1:
+            parents_index = random.sample([index for index in range(len(offspring_backup))], 2)
+            parents = [offspring_backup[parents_index[0]], offspring_backup[parents_index[1]]]
 
-    y_axis.append(value)
+            offspring_backup = [item for index,item in enumerate(offspring_backup) if index not in parents_index]
+            offspring.append(CVRPSolutionInstance.get_better_route(parents)[0])
 
-    offspring.sort(key=lambda instance: instance.fitness)
 
-    
+        better_instance, value = CVRPSolutionInstance.get_better_route(offspring)
 
-    last_generation = offspring
+        
 
+        y_axis.append(value)
+
+        offspring.sort(key=lambda instance: instance.fitness)
+
+        
+
+        last_generation = offspring
+
+    result_vector.append(y_axis[-1])
+
+for index,result in enumerate(result_vector):
+    print(index,' : ', result)
+print('mean value: ', sum(result_vector,0.0)/10)
 #print(x_axis)
+'''
 print(y_axis[-1])
 
 fig, axs = plt.subplots(2)
@@ -129,6 +137,8 @@ print(f'Fitness Gráfico: {instance_fit}')
 plt.show()
 
 #new = CVRPSolutionInstance.exchange_position_crossover(random.choice(cvrp.first_population), random.choice(cvrp.first_population), cvrp.depot_point, cvrp.max_weight)
+'''
+
 '''
 
 

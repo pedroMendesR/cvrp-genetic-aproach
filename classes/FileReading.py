@@ -3,7 +3,7 @@ from classes.Client import Client
 from classes.Point import Point
 
 
-def get_file_info(filepath="instances\instance.txt"):
+def get_file_info(filepath="instances/instance.txt"):
     xlim = [0,0]
     ylim = [0,0]
     maximum_weight_load = 0

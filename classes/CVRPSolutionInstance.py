@@ -67,6 +67,26 @@ class CVRPSolutionInstance:
         return offspring
 
     @staticmethod
+    def exchange_position_crossover_v2(parent0: 'CVRPSolutionInstance', parent1: 'CVRPSolutionInstance', depot_point: Point, max_weight: float, range_max_weight_acceptable: List[float]=[1,1]):
+        #print(parent0.list_routes)
+        #print(parent1.list_routes)
+        (parent_index, parent_routes) = (parent0,parent1)
+        route_index = random.choice(parent_index.list_routes).client_path[1:]
+        route_copied_obj = random.choice(parent_routes.list_routes)
+        route_copied = route_copied_obj.client_path[1:]
+
+        indexes = [client.id-1 for client in route_index][:1]
+
+        child_clients_sort = sum(list(map(lambda route: route.client_path, parent_index.list_routes)),[])
+        child_clients_sort = [client for client in child_clients_sort if type(client) == Client and client not in route_copied]
+
+        routes = CVRPSolutionInstance.split_list_to_routes(child_clients_sort, depot_point, max_weight, range_max_weight_acceptable)
+        routes.append(route_copied_obj)
+        
+        #input(routes)
+        return CVRPSolutionInstance(routes)
+
+    @staticmethod
     def exchange_position_crossover(parent0: 'CVRPSolutionInstance', parent1: 'CVRPSolutionInstance', depot_point: Point, max_weight: float, range_max_weight_acceptable: List[float]=[1,1]):
         #print(parent0.list_routes)
         #print(parent1.list_routes)
