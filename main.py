@@ -34,11 +34,15 @@ population_size = 200
 constructed_population = 0.3
 number_iterations = 200
 
-mutation_rate = 0.15
-crossover_rate = 0.55
+mutation_rate = 0.04
+crossover_rate = 0.49
 
 trials_number = 10
 result_vector = []
+
+x_axis = []
+y_axis = []
+
 for trial in range(trials_number):
 
     initial_population = [int(constructed_population*population_size),population_size-int(constructed_population*population_size)]
@@ -114,10 +118,9 @@ for trial in range(trials_number):
 
 for index,result in enumerate(result_vector):
     print(index,' : ', result)
-print('mean value: ', sum(result_vector,0.0)/10)
-#print(x_axis)
-'''
-print(y_axis[-1])
+print('mean value: ', sum(result_vector,0.0)/trials_number)
+
+#print(y_axis[-1])
 
 fig, axs = plt.subplots(2)
 axs[1].grid()
@@ -133,11 +136,11 @@ axs[0].set_xlim(xlim_plot)
 axs[0].set_ylim(ylim_plot)
 axs[0].plot(cvrp.depot_point.get_position_list()[0], cvrp.depot_point.get_position_list()[1], marker="o", color="b")
 axs[0].grid()
-print(f'Fitness Gráfico: {instance_fit}')
+#print(f'Fitness Gráfico: {instance_fit}')
 plt.show()
 
 #new = CVRPSolutionInstance.exchange_position_crossover(random.choice(cvrp.first_population), random.choice(cvrp.first_population), cvrp.depot_point, cvrp.max_weight)
-'''
+
 
 '''
 
