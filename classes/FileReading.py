@@ -1,3 +1,4 @@
+import random
 from classes.CVRProblem import CVRProblem
 from classes.Client import Client
 from classes.Point import Point
@@ -8,18 +9,25 @@ def get_file_info(filepath="..\instances\instance.txt"):
     ylim = [0,0]
     maximum_weight_load = 0
     depot_point = None
+    instance_name = str(random.randint(1000,9999))
     clients_list = []
     with open(filepath, "r") as instance_file:
         for line in instance_file:
             line_content = line.split(":")
             #print(line_content)
-            if "CAPACITY" in line_content[0]:
+            if "NAME" in line_content[0]:
+                instance_name = line_content[1].replace(' ','').replace('\n','')
+            elif "COMMENT" in line_content[0]:
+                optimal = line_content[3].replace(' ','').replace('\n','').replace(')','')
+            elif "CAPACITY" in line_content[0]:
                 maximum_weight_load = int(line_content[1])
             elif "NODE_COORD_SECTION" in line_content[0]:
                 depot_point, xlim, ylim = create_clients_from_node_coord_section(instance_file, clients_list)
                 #create_clients_from_node_coord_section(instance_file, clients_list)
     
     return {
+        "name" : instance_name,
+        "optimal" : optimal,
         "xlim" : xlim,
         "ylim" : ylim,
         "maximum_weight_load" : maximum_weight_load,
