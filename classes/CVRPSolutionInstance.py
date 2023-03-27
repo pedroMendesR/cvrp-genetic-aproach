@@ -25,6 +25,27 @@ class CVRPSolutionInstance:
             self.list_routes[index] = Route(clients_path, max_load)
             self.update_list_routes(self.list_routes)
             
+
+    def scramble_mutation(self, mutation_rate, max_load):
+        if random.uniform(0,1) < mutation_rate:
+            index = random.randint(0,len(self.list_routes)-1)
+            clients_path = self.list_routes[index].client_path
+            depot = clients_path[0]
+            static_index = random.randint(1,len(clients_path)-1)
+            static_client = clients_path[static_index]
+            rightpart = clients_path[:static_index][1:]
+            leftpart = clients_path[static_index+1:]
+
+            random.suffle(rightpart)
+            random.suffle(leftpart)
+
+            new_client_path = rightpart + leftpart
+            new_client_path.insert(static_index, static_client)
+            new_client_path.insert(0, depot)
+
+            self.list_routes[index] = Route(new_client_path, max_load)
+            self.update_list_routes(self.list_routes)
+            
     def update_list_routes(self, list_routes: List[Route]):
         self.list_routes = list_routes
         self.fitness = sum([route.fitness for route in list_routes])
@@ -67,7 +88,7 @@ class CVRPSolutionInstance:
         return offspring
 
     @staticmethod
-    def exchange_position_crossover_v2(parent0: 'CVRPSolutionInstance', parent1: 'CVRPSolutionInstance', depot_point: Point, max_weight: float, range_max_weight_acceptable: List[float]=[1,1]):
+    def exchange_position_crossover(parent0: 'CVRPSolutionInstance', parent1: 'CVRPSolutionInstance', depot_point: Point, max_weight: float):
         #print(parent0.list_routes)
         #print(parent1.list_routes)
         (parent_index, parent_routes) = (parent0,parent1)
@@ -80,35 +101,34 @@ class CVRPSolutionInstance:
         child_clients_sort = sum(list(map(lambda route: route.client_path, parent_index.list_routes)),[])
         child_clients_sort = [client for client in child_clients_sort if type(client) == Client and client not in route_copied]
 
-        routes = CVRPSolutionInstance.split_list_to_routes(child_clients_sort, depot_point, max_weight, range_max_weight_acceptable)
+        routes = CVRPSolutionInstance.split_list_to_routes(child_clients_sort, depot_point, max_weight, [1,1])
         routes.append(route_copied_obj)
         
         #input(routes)
         return CVRPSolutionInstance(routes)
 
     @staticmethod
-    def exchange_position_crossover(parent0: 'CVRPSolutionInstance', parent1: 'CVRPSolutionInstance', depot_point: Point, max_weight: float, range_max_weight_acceptable: List[float]=[1,1]):
-        #print(parent0.list_routes)
-        #print(parent1.list_routes)
-        (parent_index, parent_routes) = (parent0,parent1) if random.randint(0,1) == 0 else (parent1,parent0)
-        route_index = random.choice(parent_index.list_routes).client_path[1:]
-        route_copied = random.choice(parent_routes.list_routes).client_path[1:]
+    def modified_crossover(parent0: 'CVRPSolutionInstance', parent1: 'CVRPSolutionInstance', depot_point: Point, max_weight: float):
+        
+        child_clients_sort1 = sum(list(map(lambda route: route.client_path, parent0.list_routes)),[])
+        child_clients_sort1 = [client for client in child_clients_sort1 if type(client) == Client]
 
-        indexes = [client.id-1 for client in route_index][:1]
+        #print("parent: ", len(child_clients_sort1))
+        copy_until = random.randint(1, len(child_clients_sort1)-2)
+        #print("randint: ", copy_until)
+        clients_temp = []
 
-        child_clients_sort = sum(list(map(lambda route: route.client_path, parent_index.list_routes)),[])
-        child_clients_sort = [client for client in child_clients_sort if type(client) == Client and client not in route_copied]
+        for i in range(copy_until):
+            clients_temp.append(child_clients_sort1[i])
 
-        index = 0
-        for client in route_copied:
-            if indexes[index] >= len(child_clients_sort):
-                child_clients_sort.insert(-1, client)
-            else:
-                child_clients_sort.insert(indexes[index], client)
-            index = (index+1)%len(indexes)
+        child_clients_sort2 = sum(list(map(lambda route: route.client_path, parent1.list_routes)),[])
+        child_clients_sort2 = [client for client in child_clients_sort2 if type(client) == Client and client.id not in [cliente.id for cliente in clients_temp]]
 
-        routes = CVRPSolutionInstance.split_list_to_routes(child_clients_sort, depot_point, max_weight, range_max_weight_acceptable)
-        #input(routes)
+        clients_temp = clients_temp + child_clients_sort2
+        #print("clients_temp: ", len(clients_temp))
+        #print("child_clients_sort2: ", len(child_clients_sort2))
+        #input(len(clients_temp))
+        routes = CVRPSolutionInstance.split_list_to_routes(clients_temp, depot_point, max_weight, [1,1])
         return CVRPSolutionInstance(routes)
 
     @staticmethod
